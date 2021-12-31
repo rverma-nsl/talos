@@ -108,7 +108,7 @@ func (n *OpenNebula) Configuration(context.Context) ([]byte, error) {
 	}
 
 	log.Printf("fetching machine config from nebula cdrom mount")
-	vmContext, err := n.configFromCD()
+	vmContext, err := n.ConfigFromCD()
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (n *OpenNebula) KernelArgs() procfs.Parameters {
 }
 
 //nolint:gocyclo
-func (n *OpenNebula) configFromCD() (vmContext []byte, err error) {
+func (n *OpenNebula) ConfigFromCD() (vmContext []byte, err error) {
 	var dev *probe.ProbedBlockDevice
 
 	dev, err = probe.GetDevWithFileSystemLabel(strings.ToLower(configISOLabel))
@@ -179,7 +179,7 @@ func (n *OpenNebula) configFromCD() (vmContext []byte, err error) {
 		return nil, fmt.Errorf("failed to unmount: %w", err)
 	}
 
-	if vmContext == nil || len(vmContext) == 0 {
+	if len(vmContext) == 0 {
 		return nil, errors.ErrNoConfigSource
 	}
 
@@ -190,7 +190,7 @@ func getContextToMap(vmContext []byte) map[string]string {
 	entries := strings.Split(string(vmContext), "\n")
 	vmConfig := make(map[string]string)
 	for _, e := range entries {
-		if len(e) > 2 {
+		if len(e) > 2 && !strings.HasPrefix(e, "#") {
 			parts := strings.Split(e, "=")
 			vmConfig[parts[0]] = strings.Trim(parts[1], "'")
 		}
