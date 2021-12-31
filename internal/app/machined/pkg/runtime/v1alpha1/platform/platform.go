@@ -20,6 +20,7 @@ import (
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/hcloud"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/metal"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/nocloud"
+	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/opennebula"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/openstack"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/packet"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/scaleway"
@@ -84,6 +85,8 @@ func newPlatform(platform string) (p runtime.Platform, err error) {
 		p = &vmware.VMware{}
 	case "vultr":
 		p = &vultr.Vultr{}
+	case "opennebula":
+		p = &opennebula.OpenNebula{}
 	default:
 		return nil, fmt.Errorf("unknown platform: %q", platform)
 	}

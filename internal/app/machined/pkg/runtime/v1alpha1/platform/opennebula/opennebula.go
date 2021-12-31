@@ -16,6 +16,7 @@ import (
 	"github.com/talos-systems/go-blockdevice/blockdevice/filesystem"
 	"github.com/talos-systems/go-blockdevice/blockdevice/probe"
 	"github.com/talos-systems/go-procfs/procfs"
+
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/errors"
 	"github.com/talos-systems/talos/pkg/machinery/config"

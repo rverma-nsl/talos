@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
+
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/opennebula"
 	"github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1"
 )
@@ -30,7 +31,7 @@ ETH1_IP='10.2.18.9'
 ETH1_MAC='02:00:0a:02:12:09'
 ETH1_MASK='255.255.254.0'
 ETH1_NETWORK='10.2.18.0'
-SSH_PUBLIC_KEY='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDONRZFKq/IKdIbQYiaAHooP1M1o7UKxLfEGYrYYVIEhorwymmtJVwxK2qHbESaWrjDSdxRuAI5J6x+9Ruvxbha0H7XmQdbHLzkXKJcyeW44hAgMxRRMv9sMLC6CWp7XJOtQlzR/96a9KFSd7+ijQPGJxLCFKFlJgu+Sf5OlBYpP/3z9BW1fpC+PLoxcxxHeaDbvCiRcpTjd+wsBKGbm635heCewZ3Hf4lHdQO5+5WuLNud4mjUHw1uYEyACD0TrbgjIFk/tX7OkUO7t7M0k92ugFL34f7nsFozXNDnD5xFbxsWKhDJbNRbGvClxkHs68ZoMHjR003afg3wC9QSa7Rrsy0KpkJsxjbYa0KQ37aA3ifHZHqTtmEDLhpQP7G17p/Ts+l/874fpEJQei7BQP9LEugpYAQUjo4DcugE7+S2XGEBH9+fptPav46B9+ec2av2kb0q1NJfmKOYB2alNeFmcWAFZy9F6hJgrLougcQEbK3DIkpVsKt6Ue8b3N9P720= rverma@rverma.local'
+SSH_PUBLIC_KEY='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDONRZFKq/IKdIbQYiaAHooP1M1o7UKxLfEGYrYYVIEhorwymmtJVwxK2qHbESaWrjDSdxRuAI5J6x+9Ruvxbha0H7XmQdbHLzkXKJcyeW44hAgMxRRMv9sMLC6CWp7XJOtQlzR/96a9KFSd7+ijQPGJxLCFKFlJgu+Sf5OlBYpP/3z9BW1fpC+PLoxcxxHeaDbvCiRcpTjd+wsBKGbm635heCewZ3Hf4lHdQO5+5WuLNud4mjUHw1uYEyACD0TrbgjIFk/tX7OkUO7t7M0k92ugFL34f7nsFozXNDnD5xFbxsWKhDJbNRbGvClxkHs68ZoMHjR003afg3wC9QSa7Rrsy0KpkJsxjbYa0KQ37aA3ifHZHqTtmEDLhpQP7G17p/Ts+l/874fpEJQei7BQP9LEugpYAQUjo4DcugE7+WAFZy9F6hJgrLougcQEbK3DIkpVsKt6Ue8b3N9P720= rverma@rverma.local'
 	`)
 
 	n := &opennebula.OpenNebula{}
@@ -76,6 +77,7 @@ SSH_PUBLIC_KEY='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDONRZFKq/IKdIbQYiaAHooP1M1
 	suite.Require().NoError(err)
 	suite.Assert().Equal(machineConfig, result)
 }
+
 func (suite *ConfigSuite) TestNetworkConfig2() {
 	cfg := []byte(`
 ETH0_DNS='8.8.8.8 8.8.4.4'
@@ -117,7 +119,6 @@ ETH0_NETWORK='10.2.18.0'
 
 	suite.Require().NoError(err)
 	suite.Assert().Equal(machineConfig, result)
-
 }
 
 func TestConfigSuite(t *testing.T) {
