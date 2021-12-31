@@ -7,7 +7,6 @@ package opennebula
 import (
 	"context"
 	"fmt"
-	"github.com/talos-systems/talos/pkg/machinery/config/configloader"
 	"io/ioutil"
 	"log"
 	"net"
@@ -54,28 +53,29 @@ func (n *OpenNebula) ConfigurationNetwork(metadataConfig []byte, confProvider co
 		machineConfig.MachineConfig = &v1alpha1.MachineConfig{}
 	}
 
-	if machineConfig.MachineConfig.MachineNetwork == nil {
-		machineConfig.MachineConfig.MachineNetwork = &v1alpha1.NetworkConfig{}
-	}
-
 	vmConfig := getContextToMap(metadataConfig)
 
+	if machineConfig.MachineConfig.MachineNetwork == nil {
+		machineConfig.MachineConfig.MachineNetwork = &v1alpha1.NetworkConfig{NetworkHostname: "localhost", NameServers: strings.Split(vmConfig["ETH0_DNS"], " ")}
+	}
+
 	if machineConfig.MachineConfig.MachineNetwork.NetworkInterfaces == nil {
+		netmask := net.ParseIP(vmConfig["ETH0_MASK"])
+		sz, _ := net.IPMask(netmask.To4()).Size()
 		networkInterfaces := []*v1alpha1.Device{
 			{
 				DeviceInterface: "eth0",
 				DeviceDHCP:      false,
 				DeviceAddresses: []string{vmConfig["ETH0_IP"]},
+				DeviceCIDR:      fmt.Sprintf("%s/%d", vmConfig["ETH0_NETWORK"], sz),
 				DeviceRoutes: []*v1alpha1.Route{
 					{
 						RouteNetwork: "0.0.0.0/0",
 						RouteGateway: vmConfig["ETH0_GATEWAY"],
-						RouteMetric:  1024,
 					},
 				},
 			},
 		}
-
 		if _, ok := vmConfig["ETH1_IP"]; ok {
 			netmask := net.ParseIP(vmConfig["ETH1_MASK"])
 			sz, _ := net.IPMask(netmask.To4()).Size()
@@ -83,19 +83,16 @@ func (n *OpenNebula) ConfigurationNetwork(metadataConfig []byte, confProvider co
 				DeviceInterface: "eth1",
 				DeviceDHCP:      false,
 				DeviceAddresses: []string{vmConfig["ETH1_IP"]},
+				DeviceCIDR:      fmt.Sprintf("%s/%d", vmConfig["ETH1_NETWORK"], sz),
 				DeviceRoutes: []*v1alpha1.Route{
 					{
-						RouteNetwork: fmt.Sprintf("%s/%d", vmConfig["ETH1_IP"], sz),
-						RouteGateway: vmConfig["ETH0_GATEWAY"],
-						RouteMetric:  1024,
+						RouteNetwork: fmt.Sprintf("%s/%d", vmConfig["ETH1_NETWORK"], sz),
+						RouteGateway: vmConfig["ETH1_GATEWAY"],
 					},
 				},
 			})
 		}
-		machineConfig = &v1alpha1.Config{MachineConfig: &v1alpha1.MachineConfig{
-			MachineNetwork: &v1alpha1.NetworkConfig{NetworkInterfaces: networkInterfaces},
-		},
-		}
+		machineConfig.MachineConfig.MachineNetwork.NetworkInterfaces = networkInterfaces
 	}
 
 	return confProvider, nil
@@ -115,29 +112,18 @@ func (n *OpenNebula) Configuration(context.Context) ([]byte, error) {
 		return nil, err
 	}
 
-	emptyTalosConfig := &v1alpha1.Config{v1alpha1.Version, false, false, nil, nil}
-
-	emptyConfig, err := emptyTalosConfig.Bytes()
+	defaultMachineConfig := &v1alpha1.Config{}
+	finalMachineConfig, err := n.ConfigurationNetwork(vmContext, defaultMachineConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	confProvider, err := configloader.NewFromBytes(emptyConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	confProvider, err = n.ConfigurationNetwork(vmContext, confProvider)
-	if err != nil {
-		return nil, err
-	}
-
-	return confProvider.Bytes()
+	return finalMachineConfig.Bytes()
 }
 
 // Hostname implements the platform.Platform interface.
 func (n *OpenNebula) Hostname(context.Context) (hostname []byte, err error) {
-	return nil, nil
+	return []byte("localhost"), nil
 }
 
 // Mode implements the platform.Platform interface.
@@ -203,8 +189,10 @@ func getContextToMap(vmContext []byte) map[string]string {
 	entries := strings.Split(string(vmContext), "\n")
 	vmConfig := make(map[string]string)
 	for _, e := range entries {
-		parts := strings.Split(e, "=")
-		vmConfig[parts[0]] = parts[1]
+		if len(e) > 2 {
+			parts := strings.Split(e, "=")
+			vmConfig[parts[0]] = strings.Trim(parts[1], "'")
+		}
 	}
 	return vmConfig
 }
