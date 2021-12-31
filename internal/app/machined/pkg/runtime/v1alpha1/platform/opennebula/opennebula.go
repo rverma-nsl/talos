@@ -107,6 +107,10 @@ func (n *OpenNebula) Configuration(context.Context) ([]byte, error) {
 		return nil, fmt.Errorf("%s not found", constants.KernelParamConfig)
 	}
 
+	if *option == constants.ConfigNone {
+		return nil, errors.ErrNoConfigSource
+	}
+
 	log.Printf("fetching machine config from nebula cdrom mount")
 	vmContext, err := n.ConfigFromCD()
 	if err != nil {
