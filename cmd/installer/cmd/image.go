@@ -237,7 +237,33 @@ func finalize(platform runtime.Platform, img, arch string) (err error) {
 		if err = tar(name, file, dir); err != nil {
 			return err
 		}
+	case "opennebula":
+		if options.Board != constants.BoardNone {
+			name := fmt.Sprintf("opennebula-%s-%s.img", options.Board, arch)
+
+			file = filepath.Join(outputArg, name)
+
+			err = os.Rename(img, file)
+			if err != nil {
+				return err
+			}
+
+			log.Println("compressing image")
+
+			if err = xz(file); err != nil {
+				return err
+			}
+
+			break
+		}
+
+		name := fmt.Sprintf("opennebula-%s.tar.gz", arch)
+
+		if err = tar(name, file, dir); err != nil {
+			return err
+		}		
 	}
+
 
 	return nil
 }
