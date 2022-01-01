@@ -103,11 +103,8 @@ func (n *OpenNebula) ConfigurationNetwork(metadataConfig []byte, confProvider co
 //nolint:gocyclo
 func (n *OpenNebula) Configuration(context.Context) ([]byte, error) {
 	var option *string
-	if option = procfs.ProcCmdline().Get(constants.KernelParamConfig).First(); option == nil {
-		return nil, fmt.Errorf("%s not found", constants.KernelParamConfig)
-	}
 
-	if *option == constants.ConfigNone {
+	if option = procfs.ProcCmdline().Get(constants.KernelParamConfig).First(); option == nil {
 		return nil, errors.ErrNoConfigSource
 	}
 
