@@ -45,7 +45,7 @@ func (n *OpenNebula) Name() string {
 func (n *OpenNebula) ConfigurationNetwork(metadataConfig []byte, confProvider config.Provider) (config.Provider, error) {
 	var machineConfig *v1alpha1.Config
 
-	machineConfig, ok := confProvider.(*v1alpha1.Config)
+	machineConfig, ok := confProvider.Raw().(*v1alpha1.Config)
 	if !ok {
 		return nil, fmt.Errorf("unable to determine machine config type")
 	}
@@ -57,18 +57,18 @@ func (n *OpenNebula) ConfigurationNetwork(metadataConfig []byte, confProvider co
 	vmConfig := getContextToMap(metadataConfig)
 
 	if machineConfig.MachineConfig.MachineNetwork == nil {
-		machineConfig.MachineConfig.MachineNetwork = &v1alpha1.NetworkConfig{NetworkHostname: "localhost", NameServers: strings.Split(vmConfig["ETH0_DNS"], " ")}
+		machineConfig.MachineConfig.MachineNetwork = &v1alpha1.NetworkConfig{ 
+			NetworkHostname: "localhost", 
+			NameServers: strings.Split(vmConfig["ETH0_DNS"]," "),
+		}
 	}
 
 	if machineConfig.MachineConfig.MachineNetwork.NetworkInterfaces == nil {
-		netmask := net.ParseIP(vmConfig["ETH0_MASK"])
-		sz, _ := net.IPMask(netmask.To4()).Size()
 		networkInterfaces := []*v1alpha1.Device{
 			{
 				DeviceInterface: "eth0",
 				DeviceDHCP:      false,
 				DeviceAddresses: []string{vmConfig["ETH0_IP"]},
-				DeviceCIDR:      fmt.Sprintf("%s/%d", vmConfig["ETH0_NETWORK"], sz),
 				DeviceRoutes: []*v1alpha1.Route{
 					{
 						RouteNetwork: "0.0.0.0/0",
@@ -84,7 +84,6 @@ func (n *OpenNebula) ConfigurationNetwork(metadataConfig []byte, confProvider co
 				DeviceInterface: "eth1",
 				DeviceDHCP:      false,
 				DeviceAddresses: []string{vmConfig["ETH1_IP"]},
-				DeviceCIDR:      fmt.Sprintf("%s/%d", vmConfig["ETH1_NETWORK"], sz),
 				DeviceRoutes: []*v1alpha1.Route{
 					{
 						RouteNetwork: fmt.Sprintf("%s/%d", vmConfig["ETH1_NETWORK"], sz),
@@ -103,17 +102,17 @@ func (n *OpenNebula) ConfigurationNetwork(metadataConfig []byte, confProvider co
 //nolint:gocyclo
 func (n *OpenNebula) Configuration(context.Context) ([]byte, error) {
 	var option *string
-
 	if option = procfs.ProcCmdline().Get(constants.KernelParamConfig).First(); option == nil {
-		return nil, fmt.Errorf("%s not found", constants.KernelParamConfig)
-	}
-
-	if *option == constants.ConfigNone {
 		return nil, errors.ErrNoConfigSource
 	}
 
+	if *option == constants.ConfigNone {
+		return nil, errors.ErrNoConfigSource // (1)
+	}
+
 	log.Printf("fetching machine config from nebula cdrom mount")
-	vmContext, err := n.ConfigFromCD()
+	vmContext, err := n.ConfigFromCD() // (2)
+	
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +123,7 @@ func (n *OpenNebula) Configuration(context.Context) ([]byte, error) {
 		return nil, fmt.Errorf("error while reading opennebula config: %s", err)
 	}
 
-	return finalMachineConfig.Bytes()
+	return finalMachineConfig.Bytes() // (3))
 }
 
 // Hostname implements the platform.Platform interface.

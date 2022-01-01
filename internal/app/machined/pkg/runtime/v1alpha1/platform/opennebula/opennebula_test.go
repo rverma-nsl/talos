@@ -88,7 +88,6 @@ VMID='94703'
 						DeviceInterface: "eth0",
 						DeviceDHCP:      false,
 						DeviceAddresses: []string{"164.52.212.8"},
-						DeviceCIDR:      "164.52.208.0/20",
 						DeviceRoutes: []*v1alpha1.Route{
 							{
 								RouteNetwork: "0.0.0.0/0",
@@ -100,7 +99,6 @@ VMID='94703'
 						DeviceInterface: "eth1",
 						DeviceDHCP:      false,
 						DeviceAddresses: []string{"10.2.18.9"},
-						DeviceCIDR:      "10.2.18.0/23",
 						DeviceRoutes: []*v1alpha1.Route{
 							{
 								RouteNetwork: "10.2.18.0/23",
