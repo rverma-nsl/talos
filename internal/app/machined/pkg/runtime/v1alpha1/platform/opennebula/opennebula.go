@@ -105,6 +105,10 @@ func (n *OpenNebula) Configuration(context.Context) ([]byte, error) {
 	var option *string
 
 	if option = procfs.ProcCmdline().Get(constants.KernelParamConfig).First(); option == nil {
+		return nil, fmt.Errorf("%s not found", constants.KernelParamConfig)
+	}
+
+	if *option == constants.ConfigNone {
 		return nil, errors.ErrNoConfigSource
 	}
 
@@ -117,7 +121,7 @@ func (n *OpenNebula) Configuration(context.Context) ([]byte, error) {
 	defaultMachineConfig := &v1alpha1.Config{}
 	finalMachineConfig, err := n.ConfigurationNetwork(vmContext, defaultMachineConfig)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error while reading opennebula config: %s", err)
 	}
 
 	return finalMachineConfig.Bytes()
