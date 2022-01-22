@@ -102,6 +102,9 @@ RUN go install mvdan.cc/gofumpt/gofumports@${GOFUMPT_VERSION} \
 ARG STRINGER_VERSION
 RUN go install golang.org/x/tools/cmd/stringer@${STRINGER_VERSION} \
     && mv /go/bin/stringer /toolchain/go/bin/stringer
+ARG ENUMER_VERSION
+RUN go install github.com/alvaroloes/enumer@${ENUMER_VERSION} \
+    && mv /go/bin/enumer /toolchain/go/bin/enumer
 ARG DEEPCOPY_GEN_VERSION
 RUN go install k8s.io/code-generator/cmd/deepcopy-gen@${DEEPCOPY_GEN_VERSION} \
     && mv /go/bin/deepcopy-gen /toolchain/go/bin/deepcopy-gen
@@ -375,14 +378,13 @@ COPY --from=machined-build-amd64 /machined /rootfs/sbin/init
 # symlinks to avoid accidentally cleaning them up.
 COPY ./hack/cleanup.sh /toolchain/bin/cleanup.sh
 RUN cleanup.sh /rootfs
-COPY --chmod=0644 hack/containerd.toml /rootfs/etc/containerd/config.toml
-COPY --chmod=0644 hack/cri-containerd.toml /rootfs/etc/cri/containerd.toml
-RUN touch /rootfs/etc/resolv.conf
-RUN touch /rootfs/etc/hosts
-RUN touch /rootfs/etc/os-release
-RUN mkdir -pv /rootfs/{boot,usr/local/share,mnt,system,opt}
+RUN mkdir -pv /rootfs/{boot,etc/cri/conf.d/hosts,usr/local/share,mnt,system,opt}
 RUN mkdir -pv /rootfs/{etc/kubernetes/manifests,etc/cni/net.d,usr/libexec/kubernetes}
 RUN mkdir -pv /rootfs/opt/{containerd/bin,containerd/lib}
+COPY --chmod=0644 hack/containerd.toml /rootfs/etc/containerd/config.toml
+COPY --chmod=0644 hack/cri-containerd.toml /rootfs/etc/cri/containerd.toml
+COPY --chmod=0644 hack/cri-plugin.part /rootfs/etc/cri/conf.d/00-base.part
+RUN touch /rootfs/etc/{resolv.conf,hosts,os-release,machine-id,cri/conf.d/cri.toml,cri/conf.d/01-registries.part}
 RUN ln -s /etc/ssl /rootfs/etc/pki
 RUN ln -s /etc/ssl /rootfs/usr/share/ca-certificates
 RUN ln -s /etc/ssl /rootfs/usr/local/share/ca-certificates
@@ -402,6 +404,8 @@ COPY --from=pkg-libressl-arm64 / /rootfs
 COPY --from=pkg-libseccomp-arm64 / /rootfs
 COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2 /rootfs/lib/firmware/bnx2
 COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2x /rootfs/lib/firmware/bnx2x
+COPY --from=pkg-linux-firmware-arm64 /lib/firmware/rtl_nic /rootfs/lib/firmware/rtl_nic
+COPY --from=pkg-linux-firmware-arm64 /lib/firmware/nvidia/tegra210 /rootfs/lib/firmware/nvidia/tegra210
 COPY --from=pkg-lvm2-arm64 / /rootfs
 COPY --from=pkg-libaio-arm64 / /rootfs
 COPY --from=pkg-musl-arm64 / /rootfs
@@ -419,14 +423,13 @@ COPY --from=machined-build-arm64 /machined /rootfs/sbin/init
 # symlinks to avoid accidentally cleaning them up.
 COPY ./hack/cleanup.sh /toolchain/bin/cleanup.sh
 RUN cleanup.sh /rootfs
-COPY --chmod=0644 hack/containerd.toml /rootfs/etc/containerd/containerd.toml
-COPY --chmod=0644 hack/cri-containerd.toml /rootfs/etc/cri/containerd.toml
-RUN touch /rootfs/etc/resolv.conf
-RUN touch /rootfs/etc/hosts
-RUN touch /rootfs/etc/os-release
-RUN mkdir -pv /rootfs/{boot,usr/local/share,mnt,system,opt}
+RUN mkdir -pv /rootfs/{boot,etc/cri/conf.d/hosts,usr/local/share,mnt,system,opt}
 RUN mkdir -pv /rootfs/{etc/kubernetes/manifests,etc/cni/net.d,usr/libexec/kubernetes}
 RUN mkdir -pv /rootfs/opt/{containerd/bin,containerd/lib}
+COPY --chmod=0644 hack/containerd.toml /rootfs/etc/containerd/config.toml
+COPY --chmod=0644 hack/cri-containerd.toml /rootfs/etc/cri/containerd.toml
+COPY --chmod=0644 hack/cri-plugin.part /rootfs/etc/cri/conf.d/00-base.part
+RUN touch /rootfs/etc/{resolv.conf,hosts,os-release,machine-id,cri/conf.d/cri.toml,cri/conf.d/01-registries.part}
 RUN ln -s /etc/ssl /rootfs/etc/pki
 RUN ln -s /etc/ssl /rootfs/usr/share/ca-certificates
 RUN ln -s /etc/ssl /rootfs/usr/local/share/ca-certificates
@@ -459,6 +462,9 @@ FROM build AS initramfs-archive-arm64
 WORKDIR /initramfs
 COPY --from=squashfs-arm64 /rootfs.sqsh .
 COPY --from=init-build-arm64 /init .
+# copying over firmware binary blobs to initramfs
+COPY --from=pkg-linux-firmware-arm64 /lib/firmware/rtl_nic ./lib/firmware/rtl_nic
+COPY --from=pkg-linux-firmware-arm64 /lib/firmware/nvidia/tegra210 ./lib/firmware/nvidia/tegra210
 RUN find . -print0 \
     | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
 RUN set -o pipefail \
@@ -663,7 +669,7 @@ RUN --mount=type=cache,target=/.cache prototool break check --descriptor-set-pat
 
 # The markdownlint target performs linting on Markdown files.
 
-FROM node:17.3.0-alpine AS lint-markdown
+FROM node:17.3.1-alpine AS lint-markdown
 RUN apk add --no-cache findutils
 RUN npm i -g markdownlint-cli@0.23.2
 RUN npm i -g textlint@11.7.6

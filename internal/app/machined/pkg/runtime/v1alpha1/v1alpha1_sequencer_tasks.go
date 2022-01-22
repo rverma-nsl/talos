@@ -50,7 +50,6 @@ import (
 	"github.com/talos-systems/talos/internal/app/machined/pkg/system/events"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/system/services"
 	"github.com/talos-systems/talos/internal/app/maintenance"
-	"github.com/talos-systems/talos/internal/pkg/containers/cri/containerd"
 	"github.com/talos-systems/talos/internal/pkg/cri"
 	"github.com/talos-systems/talos/internal/pkg/etcd"
 	"github.com/talos-systems/talos/internal/pkg/mount"
@@ -429,7 +428,7 @@ func LoadConfig(seq runtime.Sequence, data interface{}) (runtime.TaskExecutionFu
 
 			if e != nil {
 				r.Events().Publish(&machineapi.ConfigLoadErrorEvent{
-					Error: err.Error(),
+					Error: e.Error(),
 				})
 
 				return e
@@ -440,7 +439,7 @@ func LoadConfig(seq runtime.Sequence, data interface{}) (runtime.TaskExecutionFu
 			cfg, e := r.LoadAndValidateConfig(b)
 			if e != nil {
 				r.Events().Publish(&machineapi.ConfigLoadErrorEvent{
-					Error: err.Error(),
+					Error: e.Error(),
 				})
 
 				return e
@@ -892,13 +891,6 @@ func WriteUserFiles(seq runtime.Sequence, data interface{}) (runtime.TaskExecuti
 		if err != nil {
 			return fmt.Errorf("error generating extra files: %w", err)
 		}
-
-		extra, err := containerd.GenerateRegistriesConfig(r.Config().Machine().Registries())
-		if err != nil {
-			return err
-		}
-
-		files = append(files, extra...)
 
 		for _, f := range files {
 			content := f.Content()

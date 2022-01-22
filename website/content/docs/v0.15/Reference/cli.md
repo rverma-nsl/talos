@@ -16,13 +16,11 @@ talosctl apply-config [flags]
 ### Options
 
 ```
-      --cert-fingerprint strings   list of server certificate fingeprints to accept (defaults to no check)
-  -f, --file string                the filename of the updated configuration
-  -h, --help                       help for apply-config
-      --immediate                  apply the config immediately (without a reboot)
-  -i, --insecure                   apply the config using the insecure (encrypted with no auth) maintenance service
-      --interactive                apply the config using text based interactive mode
-      --on-reboot                  apply the config on reboot
+      --cert-fingerprint strings                            list of server certificate fingeprints to accept (defaults to no check)
+  -f, --file string                                         the filename of the updated configuration
+  -h, --help                                                help for apply-config
+  -i, --insecure                                            apply the config using the insecure (encrypted with no auth) maintenance service
+  -m, --mode auto, interactive, no-reboot, reboot, staged   apply config mode (default auto)
 ```
 
 ### Options inherited from parent commands
@@ -120,7 +118,7 @@ talosctl cluster create [flags]
       --ipv4                                    enable IPv4 network in the cluster (default true)
       --ipv6                                    enable IPv6 network in the cluster (QEMU provisioner only)
       --iso-path string                         the ISO path to use for the initial boot (VM only)
-      --kubernetes-version string               desired kubernetes version to run (default "1.23.1")
+      --kubernetes-version string               desired kubernetes version to run (default "1.23.2")
       --masters int                             the number of masters to create (default 1)
       --memory int                              the limit on memory usage in MB (each container/VM) (default 2048)
       --mtu int                                 MTU of the cluster network (default 1500)
@@ -816,10 +814,9 @@ talosctl edit <type> [<id>] [flags]
 ### Options
 
 ```
-  -h, --help               help for edit
-      --immediate          apply the change immediately (without a reboot)
-      --namespace string   resource namespace (default is to use default namespace per resource)
-      --on-reboot          apply the change on next reboot
+  -h, --help                                   help for edit
+  -m, --mode auto, no-reboot, reboot, staged   apply config mode (default auto)
+      --namespace string                       resource namespace (default is to use default namespace per resource)
 ```
 
 ### Options inherited from parent commands
@@ -1588,12 +1585,11 @@ talosctl patch <type> [<id>] [flags]
 ### Options
 
 ```
-  -h, --help                help for patch
-      --immediate           apply the change immediately (without a reboot)
-      --namespace string    resource namespace (default is to use default namespace per resource)
-      --on-reboot           apply the change on next reboot
-  -p, --patch string        the patch to be applied to the resource file.
-      --patch-file string   a file containing a patch to be applied to the resource.
+  -h, --help                                   help for patch
+  -m, --mode auto, no-reboot, reboot, staged   apply config mode (default auto)
+      --namespace string                       resource namespace (default is to use default namespace per resource)
+  -p, --patch string                           the patch to be applied to the resource file.
+      --patch-file string                      a file containing a patch to be applied to the resource.
 ```
 
 ### Options inherited from parent commands
@@ -1996,7 +1992,7 @@ talosctl upgrade-k8s [flags]
       --endpoint string   the cluster control plane endpoint
       --from string       the Kubernetes control plane version to upgrade from
   -h, --help              help for upgrade-k8s
-      --to string         the Kubernetes control plane version to upgrade to (default "1.23.1")
+      --to string         the Kubernetes control plane version to upgrade to (default "1.23.2")
       --upgrade-kubelet   upgrade kubelet service (default true)
 ```
 

@@ -22,6 +22,7 @@ import (
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/nocloud"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/opennebula"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/openstack"
+	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/oracle"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/packet"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/scaleway"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime/v1alpha1/platform/upcloud"
@@ -73,6 +74,8 @@ func newPlatform(platform string) (p runtime.Platform, err error) {
 		p = &metal.Metal{}
 	case "openstack":
 		p = &openstack.Openstack{}
+	case "oracle":
+		p = &oracle.Oracle{}
 	case "nocloud":
 		p = &nocloud.Nocloud{}
 	case "packet":

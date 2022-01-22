@@ -13,7 +13,7 @@ import (
 
 const (
 	// DefaultKernelVersion is the default Linux kernel version.
-	DefaultKernelVersion = "5.15.11-talos"
+	DefaultKernelVersion = "5.15.16-talos"
 
 	// KernelParamConfig is the kernel parameter name for specifying the URL.
 	// to the config.
@@ -57,6 +57,9 @@ const (
 	// BoardPine64 is the  name of the Pine64.
 	BoardPine64 = "pine64"
 
+	// BoardJetsonNano is the name of the Jetson Nano.
+	BoardJetsonNano = "jetson_nano"
+
 	// BoardRock64 is the  name of the Rock64.
 	BoardRock64 = "rock64"
 
@@ -82,6 +85,12 @@ const (
 
 	// NewRoot is the path where the switchroot target is mounted.
 	NewRoot = "/root"
+
+	// ExtensionLayers is the path where the extensions layers are stored.
+	ExtensionLayers = "/layers"
+
+	// ExtensionsConfigFile extensions layers configuration file name.
+	ExtensionsConfigFile = "/extensions.yaml"
 
 	// EFIPartitionLabel is the label of the partition to use for mounting at
 	// the boot path.
@@ -218,7 +227,7 @@ const (
 	SystemKubeletPKIDir = "/system/secrets/kubelet"
 
 	// DefaultKubernetesVersion is the default target version of the control plane.
-	DefaultKubernetesVersion = "1.23.1"
+	DefaultKubernetesVersion = "1.23.2"
 
 	// DefaultControlPlanePort is the default port to use for the control plane.
 	DefaultControlPlanePort = 6443
@@ -245,7 +254,7 @@ const (
 	CoreDNSImage = "docker.io/coredns/coredns"
 
 	// DefaultCoreDNSVersion is the default version for the CoreDNS.
-	DefaultCoreDNSVersion = "1.8.6"
+	DefaultCoreDNSVersion = "1.8.7"
 
 	// LabelNodeRoleMaster is the node label required by a control plane node.
 	LabelNodeRoleMaster = "node-role.kubernetes.io/master"
@@ -341,7 +350,7 @@ const (
 	TrustdUserID = 51
 
 	// DefaultContainerdVersion is the default container runtime version.
-	DefaultContainerdVersion = "1.5.8"
+	DefaultContainerdVersion = "1.6.0-rc.0"
 
 	// SystemContainerdNamespace is the Containerd namespace for Talos services.
 	SystemContainerdNamespace = "system"
@@ -354,6 +363,15 @@ const (
 
 	// CRIContainerdConfig is the path to the config for the containerd instance that provides the CRI.
 	CRIContainerdConfig = "/etc/cri/containerd.toml"
+
+	// CRIConfdPath is the path to the directory providing parts of CRI plugin configuration.
+	CRIConfdPath = "/etc/cri/conf.d"
+
+	// CRIConfig is the path to the CRI merged configuration file relative to /etc.
+	CRIConfig = "cri/conf.d/cri.toml"
+
+	// CRIRegistryConfigPart is the path to the CRI generated registry configuration relative to /etc.
+	CRIRegistryConfigPart = "cri/conf.d/01-registries.part"
 
 	// TalosConfigEnvVar is the environment variable for setting the Talos configuration file path.
 	TalosConfigEnvVar = "TALOSCONFIG"
@@ -565,6 +583,9 @@ const (
 
 	// SideroLinkDefaultPeerKeepalive is the interval at which Wireguard Peer Keepalives should be sent.
 	SideroLinkDefaultPeerKeepalive = 25 * time.Second
+
+	// PlatformNetworkConfigFilename is the filename to cache platform network configuration reboots.
+	PlatformNetworkConfigFilename = "platform-network.yaml"
 )
 
 // See https://linux.die.net/man/3/klogctl
