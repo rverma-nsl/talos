@@ -200,7 +200,7 @@ func upgradeStaticPodOnNode(ctx context.Context, cluster UpgradeProvider, option
 	}
 
 	options.Log(" > %q: machine configuration patched", node)
-	options.Log(" > %q: waiting for API server state pod update", node)
+	options.Log(" > %q: waiting for %s pod update", node, service)
 
 	var expectedConfigVersion string
 
@@ -333,7 +333,7 @@ func getManifests(ctx context.Context, cluster UpgradeProvider) ([]*unstructured
 		return nil, err
 	}
 
-	defer talosclient.Close() //nolint:errcheck
+	defer cluster.Close() //nolint:errcheck
 
 	listClient, err := talosclient.Resources.List(ctx, k8s.ControlPlaneNamespaceName, k8s.ManifestType)
 	if err != nil {

@@ -1006,6 +1006,11 @@ type InstallConfig struct {
 	//     - value: '"ghcr.io/talos-systems/installer:latest"'
 	InstallImage string `yaml:"image,omitempty"`
 	//   description: |
+	//     Allows for supplying additional system extension images to install on top of base Talos image.
+	//   examples:
+	//     - value: '"ghcr.io/talos-systems/gvisor:20220117.0-v1.0.0"'
+	InstallExtensions []InstallExtensionConfig `yaml:"extensions,omitempty"`
+	//   description: |
 	//     Indicates if a bootloader should be installed.
 	//   values:
 	//     - true
@@ -1159,6 +1164,17 @@ type InstallDiskSelector struct {
 	//     - nvme
 	//     - sd
 	Type InstallDiskType `yaml:"type,omitempty"`
+	//   description: Disk bus path.
+	//   examples:
+	//     - value: '"/pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0"'
+	//     - value: '"/pci0000:00/*"'
+	BusPath string `yaml:"busPath,omitempty"`
+}
+
+// InstallExtensionConfig represents a configuration for a system extension.
+type InstallExtensionConfig struct {
+	//   description: System extension image.
+	ExtensionImage string `yaml:"image"`
 }
 
 // TimeConfig represents the options for configuring time on a machine.
@@ -1911,9 +1927,9 @@ type Vlan struct {
 
 // Route represents a network route.
 type Route struct {
-	//   description: The route's network.
+	//   description: The route's network (destination).
 	RouteNetwork string `yaml:"network"`
-	//   description: The route's gateway.
+	//   description: The route's gateway (if empty, creates link scope route).
 	RouteGateway string `yaml:"gateway"`
 	//   description: The route's source address (optional).
 	RouteSource string `yaml:"source,omitempty"`

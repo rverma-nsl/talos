@@ -13,7 +13,7 @@ import (
 
 const (
 	// DefaultKernelVersion is the default Linux kernel version.
-	DefaultKernelVersion = "5.15.16-talos"
+	DefaultKernelVersion = "5.15.19-talos"
 
 	// KernelParamConfig is the kernel parameter name for specifying the URL.
 	// to the config.
@@ -89,8 +89,11 @@ const (
 	// ExtensionLayers is the path where the extensions layers are stored.
 	ExtensionLayers = "/layers"
 
-	// ExtensionsConfigFile extensions layers configuration file name.
+	// ExtensionsConfigFile is the extensions layers configuration file name in the initramfs.
 	ExtensionsConfigFile = "/extensions.yaml"
+
+	// ExtensionsRuntimeConfigFile extensions layers configuration file name in the rootfs.
+	ExtensionsRuntimeConfigFile = "/etc/extensions.yaml"
 
 	// EFIPartitionLabel is the label of the partition to use for mounting at
 	// the boot path.
@@ -227,7 +230,7 @@ const (
 	SystemKubeletPKIDir = "/system/secrets/kubelet"
 
 	// DefaultKubernetesVersion is the default target version of the control plane.
-	DefaultKubernetesVersion = "1.23.2"
+	DefaultKubernetesVersion = "1.23.3"
 
 	// DefaultControlPlanePort is the default port to use for the control plane.
 	DefaultControlPlanePort = 6443
@@ -284,7 +287,7 @@ const (
 	KubeletSystemReservedEphemeralStorage = "256Mi"
 
 	// DefaultEtcdVersion is the default target version of etcd.
-	DefaultEtcdVersion = "v3.5.1"
+	DefaultEtcdVersion = "v3.5.2"
 
 	// EtcdRootTalosKey is the root etcd key for Talos-specific storage.
 	EtcdRootTalosKey = "talos:v1"
@@ -433,6 +436,9 @@ const (
 
 	// SystemLibexecPath is the path to the system libexec directory.
 	SystemLibexecPath = SystemPath + "/libexec"
+
+	// SystemExtensionsPath is the path to the system extensions directory.
+	SystemExtensionsPath = SystemPath + "/extensions"
 
 	// CgroupMountPath is the default mount path for unified cgroupsv2 setup.
 	CgroupMountPath = "/sys/fs/cgroup"
@@ -586,6 +592,9 @@ const (
 
 	// PlatformNetworkConfigFilename is the filename to cache platform network configuration reboots.
 	PlatformNetworkConfigFilename = "platform-network.yaml"
+
+	// FirmwarePath is the path to the standard Linux firmware location.
+	FirmwarePath = "/lib/firmware"
 )
 
 // See https://linux.die.net/man/3/klogctl

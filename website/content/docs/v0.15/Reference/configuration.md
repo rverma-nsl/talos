@@ -148,6 +148,10 @@ install:
     # diskSelector:
     #     size: 4GB # Disk size.
     #     model: WDC* # Disk model `/sys/block/<dev>/device/model`.
+    #     busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0 # Disk bus path.
+
+    # # Allows for supplying additional system extension images to install on top of base Talos image.
+    # extensions: ghcr.io/talos-systems/gvisor:20220117.0-v1.0.0
 ```
 
 <hr />
@@ -312,7 +316,7 @@ Examples:
 
 ``` yaml
 kubelet:
-    image: ghcr.io/talos-systems/kubelet:v1.23.2 # The `image` field is an optional reference to an alternative kubelet image.
+    image: ghcr.io/talos-systems/kubelet:v1.23.3 # The `image` field is an optional reference to an alternative kubelet image.
     # The `extraArgs` field is used to provide additional flags to the kubelet.
     extraArgs:
         feature-gates: ServerSideApply=true
@@ -370,8 +374,8 @@ network:
             - 192.168.2.0/24
           # A list of routes associated with the interface.
           routes:
-            - network: 0.0.0.0/0 # The route's network.
-              gateway: 192.168.2.1 # The route's gateway.
+            - network: 0.0.0.0/0 # The route's network (destination).
+              gateway: 192.168.2.1 # The route's gateway (if empty, creates link scope route).
               metric: 1024 # The optional metric for the route.
           mtu: 1500 # The interface's MTU.
 
@@ -509,6 +513,10 @@ install:
     # diskSelector:
     #     size: 4GB # Disk size.
     #     model: WDC* # Disk model `/sys/block/<dev>/device/model`.
+    #     busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0 # Disk bus path.
+
+    # # Allows for supplying additional system extension images to install on top of base Talos image.
+    # extensions: ghcr.io/talos-systems/gvisor:20220117.0-v1.0.0
 ```
 
 
@@ -1102,7 +1110,7 @@ Examples:
 
 ``` yaml
 apiServer:
-    image: k8s.gcr.io/kube-apiserver:v1.23.2 # The container image used in the API server manifest.
+    image: k8s.gcr.io/kube-apiserver:v1.23.3 # The container image used in the API server manifest.
     # Extra arguments to supply to the API server.
     extraArgs:
         feature-gates: ServerSideApply=true
@@ -1133,7 +1141,7 @@ Examples:
 
 ``` yaml
 controllerManager:
-    image: k8s.gcr.io/kube-controller-manager:v1.23.2 # The container image used in the controller manager manifest.
+    image: k8s.gcr.io/kube-controller-manager:v1.23.3 # The container image used in the controller manager manifest.
     # Extra arguments to supply to the controller manager.
     extraArgs:
         feature-gates: ServerSideApply=true
@@ -1159,7 +1167,7 @@ Examples:
 
 ``` yaml
 proxy:
-    image: k8s.gcr.io/kube-proxy:v1.23.2 # The container image used in the kube-proxy manifest.
+    image: k8s.gcr.io/kube-proxy:v1.23.3 # The container image used in the kube-proxy manifest.
     mode: ipvs # proxy mode of kube-proxy.
     # Extra arguments to supply to kube-proxy.
     extraArgs:
@@ -1186,7 +1194,7 @@ Examples:
 
 ``` yaml
 scheduler:
-    image: k8s.gcr.io/kube-scheduler:v1.23.2 # The container image used in the scheduler manifest.
+    image: k8s.gcr.io/kube-scheduler:v1.23.3 # The container image used in the scheduler manifest.
     # Extra arguments to supply to the scheduler.
     extraArgs:
         feature-gates: AllBeta=true
@@ -1242,7 +1250,7 @@ Examples:
 
 ``` yaml
 etcd:
-    image: gcr.io/etcd-development/etcd:v3.5.1 # The container image used to create the etcd service.
+    image: gcr.io/etcd-development/etcd:v3.5.2 # The container image used to create the etcd service.
     # The `ca` is the root certificate authority of the PKI.
     ca:
         crt: TFMwdExTMUNSVWRKVGlCRFJWSlVTVVpKUTBGVVJTMHRMUzB0Q2sxSlNVSklla05DTUhGLi4u
@@ -1565,7 +1573,7 @@ Appears in:
 
 
 ``` yaml
-image: ghcr.io/talos-systems/kubelet:v1.23.2 # The `image` field is an optional reference to an alternative kubelet image.
+image: ghcr.io/talos-systems/kubelet:v1.23.3 # The `image` field is an optional reference to an alternative kubelet image.
 # The `extraArgs` field is used to provide additional flags to the kubelet.
 extraArgs:
     feature-gates: ServerSideApply=true
@@ -1611,7 +1619,7 @@ Examples:
 
 
 ``` yaml
-image: ghcr.io/talos-systems/kubelet:v1.23.2
+image: ghcr.io/talos-systems/kubelet:v1.23.3
 ```
 
 
@@ -1805,8 +1813,8 @@ interfaces:
         - 192.168.2.0/24
       # A list of routes associated with the interface.
       routes:
-        - network: 0.0.0.0/0 # The route's network.
-          gateway: 192.168.2.1 # The route's gateway.
+        - network: 0.0.0.0/0 # The route's network (destination).
+          gateway: 192.168.2.1 # The route's gateway (if empty, creates link scope route).
           metric: 1024 # The optional metric for the route.
       mtu: 1500 # The interface's MTU.
 
@@ -1910,8 +1918,8 @@ interfaces:
         - 192.168.2.0/24
       # A list of routes associated with the interface.
       routes:
-        - network: 0.0.0.0/0 # The route's network.
-          gateway: 192.168.2.1 # The route's gateway.
+        - network: 0.0.0.0/0 # The route's network (destination).
+          gateway: 192.168.2.1 # The route's gateway (if empty, creates link scope route).
           metric: 1024 # The optional metric for the route.
       mtu: 1500 # The interface's MTU.
 
@@ -2065,6 +2073,10 @@ wipe: false # Indicates if the installation disk should be wiped at installation
 # diskSelector:
 #     size: 4GB # Disk size.
 #     model: WDC* # Disk model `/sys/block/<dev>/device/model`.
+#     busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0 # Disk bus path.
+
+# # Allows for supplying additional system extension images to install on top of base Talos image.
+# extensions: ghcr.io/talos-systems/gvisor:20220117.0-v1.0.0
 ```
 
 <hr />
@@ -2114,6 +2126,7 @@ Examples:
 diskSelector:
     size: 4GB # Disk size.
     model: WDC* # Disk model `/sys/block/<dev>/device/model`.
+    busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0 # Disk bus path.
 ```
 
 
@@ -2162,6 +2175,28 @@ Examples:
 
 ``` yaml
 image: ghcr.io/talos-systems/installer:latest
+```
+
+
+</div>
+
+<hr />
+<div class="dd">
+
+<code>extensions</code>  <i>[]<a href="#installextensionconfig">InstallExtensionConfig</a></i>
+
+</div>
+<div class="dt">
+
+Allows for supplying additional system extension images to install on top of base Talos image.
+
+
+
+Examples:
+
+
+``` yaml
+extensions: ghcr.io/talos-systems/gvisor:20220117.0-v1.0.0
 ```
 
 
@@ -2242,6 +2277,7 @@ Appears in:
 ``` yaml
 size: 4GB # Disk size.
 model: WDC* # Disk model `/sys/block/<dev>/device/model`.
+busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0 # Disk bus path.
 ```
 
 <hr />
@@ -2368,6 +2404,61 @@ Valid values:
   - <code>nvme</code>
 
   - <code>sd</code>
+</div>
+
+<hr />
+<div class="dd">
+
+<code>busPath</code>  <i>string</i>
+
+</div>
+<div class="dt">
+
+Disk bus path.
+
+
+
+Examples:
+
+
+``` yaml
+busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0
+```
+
+``` yaml
+busPath: /pci0000:00/*
+```
+
+
+</div>
+
+<hr />
+
+
+
+## InstallExtensionConfig
+InstallExtensionConfig represents a configuration for a system extension.
+
+Appears in:
+
+- <code><a href="#installconfig">InstallConfig</a>.extensions</code>
+
+
+``` yaml
+ghcr.io/talos-systems/gvisor:20220117.0-v1.0.0
+```
+
+<hr />
+
+<div class="dd">
+
+<code>image</code>  <i>string</i>
+
+</div>
+<div class="dt">
+
+System extension image.
+
 </div>
 
 <hr />
@@ -2700,7 +2791,7 @@ Appears in:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-apiserver:v1.23.2 # The container image used in the API server manifest.
+image: k8s.gcr.io/kube-apiserver:v1.23.3 # The container image used in the API server manifest.
 # Extra arguments to supply to the API server.
 extraArgs:
     feature-gates: ServerSideApply=true
@@ -2728,7 +2819,7 @@ Examples:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-apiserver:v1.23.2
+image: k8s.gcr.io/kube-apiserver:v1.23.3
 ```
 
 
@@ -2795,7 +2886,7 @@ Appears in:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-controller-manager:v1.23.2 # The container image used in the controller manager manifest.
+image: k8s.gcr.io/kube-controller-manager:v1.23.3 # The container image used in the controller manager manifest.
 # Extra arguments to supply to the controller manager.
 extraArgs:
     feature-gates: ServerSideApply=true
@@ -2818,7 +2909,7 @@ Examples:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-controller-manager:v1.23.2
+image: k8s.gcr.io/kube-controller-manager:v1.23.3
 ```
 
 
@@ -2861,7 +2952,7 @@ Appears in:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-proxy:v1.23.2 # The container image used in the kube-proxy manifest.
+image: k8s.gcr.io/kube-proxy:v1.23.3 # The container image used in the kube-proxy manifest.
 mode: ipvs # proxy mode of kube-proxy.
 # Extra arguments to supply to kube-proxy.
 extraArgs:
@@ -2907,7 +2998,7 @@ Examples:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-proxy:v1.23.2
+image: k8s.gcr.io/kube-proxy:v1.23.3
 ```
 
 
@@ -2951,7 +3042,7 @@ Appears in:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-scheduler:v1.23.2 # The container image used in the scheduler manifest.
+image: k8s.gcr.io/kube-scheduler:v1.23.3 # The container image used in the scheduler manifest.
 # Extra arguments to supply to the scheduler.
 extraArgs:
     feature-gates: AllBeta=true
@@ -2974,7 +3065,7 @@ Examples:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-scheduler:v1.23.2
+image: k8s.gcr.io/kube-scheduler:v1.23.3
 ```
 
 
@@ -3017,7 +3108,7 @@ Appears in:
 
 
 ``` yaml
-image: gcr.io/etcd-development/etcd:v3.5.1 # The container image used to create the etcd service.
+image: gcr.io/etcd-development/etcd:v3.5.2 # The container image used to create the etcd service.
 # The `ca` is the root certificate authority of the PKI.
 ca:
     crt: TFMwdExTMUNSVWRKVGlCRFJWSlVTVVpKUTBGVVJTMHRMUzB0Q2sxSlNVSklla05DTUhGLi4u
@@ -3047,7 +3138,7 @@ Examples:
 
 
 ``` yaml
-image: gcr.io/etcd-development/etcd:v3.5.1
+image: gcr.io/etcd-development/etcd:v3.5.2
 ```
 
 
@@ -3886,8 +3977,8 @@ Appears in:
     - 192.168.2.0/24
   # A list of routes associated with the interface.
   routes:
-    - network: 0.0.0.0/0 # The route's network.
-      gateway: 192.168.2.1 # The route's gateway.
+    - network: 0.0.0.0/0 # The route's network (destination).
+      gateway: 192.168.2.1 # The route's gateway (if empty, creates link scope route).
       metric: 1024 # The optional metric for the route.
   mtu: 1500 # The interface's MTU.
 
@@ -4003,10 +4094,10 @@ Examples:
 
 ``` yaml
 routes:
-    - network: 0.0.0.0/0 # The route's network.
-      gateway: 10.5.0.1 # The route's gateway.
-    - network: 10.2.0.0/16 # The route's network.
-      gateway: 10.2.0.1 # The route's gateway.
+    - network: 0.0.0.0/0 # The route's network (destination).
+      gateway: 10.5.0.1 # The route's gateway (if empty, creates link scope route).
+    - network: 10.2.0.0/16 # The route's network (destination).
+      gateway: 10.2.0.1 # The route's gateway (if empty, creates link scope route).
 ```
 
 
@@ -4992,10 +5083,10 @@ Appears in:
 
 
 ``` yaml
-- network: 0.0.0.0/0 # The route's network.
-  gateway: 10.5.0.1 # The route's gateway.
-- network: 10.2.0.0/16 # The route's network.
-  gateway: 10.2.0.1 # The route's gateway.
+- network: 0.0.0.0/0 # The route's network (destination).
+  gateway: 10.5.0.1 # The route's gateway (if empty, creates link scope route).
+- network: 10.2.0.0/16 # The route's network (destination).
+  gateway: 10.2.0.1 # The route's gateway (if empty, creates link scope route).
 ```
 
 <hr />
@@ -5007,7 +5098,7 @@ Appears in:
 </div>
 <div class="dt">
 
-The route's network.
+The route's network (destination).
 
 </div>
 
@@ -5019,7 +5110,7 @@ The route's network.
 </div>
 <div class="dt">
 
-The route's gateway.
+The route's gateway (if empty, creates link scope route).
 
 </div>
 

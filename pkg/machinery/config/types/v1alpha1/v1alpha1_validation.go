@@ -211,6 +211,18 @@ func (c *Config) Validate(mode config.RuntimeMode, options ...config.ValidationO
 		result = multierror.Append(result, err)
 	}
 
+	if c.MachineConfig.MachineInstall != nil {
+		extensions := map[string]struct{}{}
+
+		for _, ext := range c.MachineConfig.MachineInstall.InstallExtensions {
+			if _, exists := extensions[ext.Image()]; exists {
+				result = multierror.Append(result, fmt.Errorf("duplicate system extension %q", ext.Image()))
+			}
+
+			extensions[ext.Image()] = struct{}{}
+		}
+	}
+
 	if opts.Strict {
 		for _, w := range warnings {
 			result = multierror.Append(result, fmt.Errorf("warning: %s", w))
@@ -669,6 +681,8 @@ func CheckDeviceAddressing(d *Device, bondedInterfaces map[string]string) ([]str
 }
 
 // CheckDeviceRoutes ensures that the specified routes are valid.
+//
+//nolint:gocyclo
 func CheckDeviceRoutes(d *Device, bondedInterfaces map[string]string) ([]string, error) {
 	var result *multierror.Error
 
@@ -687,8 +701,14 @@ func CheckDeviceRoutes(d *Device, bondedInterfaces map[string]string) ([]string,
 			}
 		}
 
-		if ip := net.ParseIP(route.Gateway()); ip == nil {
-			result = multierror.Append(result, fmt.Errorf("[%s] %q: %w", "networking.os.device.route["+strconv.Itoa(idx)+"].gateway", route.Gateway(), ErrInvalidAddress))
+		if route.Gateway() != "" {
+			if ip := net.ParseIP(route.Gateway()); ip == nil {
+				result = multierror.Append(result, fmt.Errorf("[%s] %q: %w", "networking.os.device.route["+strconv.Itoa(idx)+"].gateway", route.Gateway(), ErrInvalidAddress))
+			}
+		}
+
+		if route.Gateway() == "" && route.Network() == "" {
+			result = multierror.Append(result, fmt.Errorf("[%s]: %s", "networking.os.device.route["+strconv.Itoa(idx)+"]", "either network or gateway should be set"))
 		}
 
 		if route.Source() != "" {
